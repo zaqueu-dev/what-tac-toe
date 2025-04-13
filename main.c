@@ -16,6 +16,7 @@ int main() {
     // Verifica se há vencedor
     if (check_winner(&game)) {
       printf("Jogador %c venceu!\n", game.player_turn ? 'O' : 'X');
+
       break;
     }
 

@@ -6,7 +6,9 @@
 #define CELL_SIZE 100
 
 typedef struct {
+  unsigned int id;
   unsigned char *board_image;
+  unsigned char *original_image;
   int width, height, channels;
   char game_board[BOARD_SIZE][BOARD_SIZE];
   bool player_turn; // true para X, false para O
