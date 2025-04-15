@@ -144,3 +144,33 @@ void save_game_state(Game *game, const char *output_path) {
     fprintf(stderr, "Erro ao salvar a imagem\n");
   }
 }
+
+int arquivo_modificado(const char *filename, time_t *last_mod_time) {
+  struct stat attr;
+  if (stat(filename, &attr) != 0) {
+    perror("Erro ao obter informações do arquivo");
+    return -1;
+  }
+
+  if (difftime(attr.st_mtime, *last_mod_time) > 0) {
+    *last_mod_time = attr.st_mtime;
+    return 1; // Modificado
+  }
+  return 0; // Não modificado
+}
+
+void processar_json(const char *filename) {
+  FILE *file = fopen(filename, "r");
+  if (!file) {
+    perror("Erro ao abrir arquivo");
+    return;
+  }
+
+  printf("Processando JSON...\n");
+  char buffer[1024];
+  while (fgets(buffer, sizeof(buffer), file)) {
+    printf("%s", buffer);
+  }
+  printf("\n");
+  fclose(file);
+}

@@ -1,0 +1,14 @@
+{
+  "req": {
+    "type": [
+      {
+        "item": "newGame",
+        "gameId": "bigint"
+      }
+
+    ]
+  },
+  "res": {
+
+  }
+}

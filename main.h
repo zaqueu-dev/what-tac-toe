@@ -1,6 +1,9 @@
 #include "stb_wrapper.h"
 #include <math.h>
 #include <stdbool.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
 
 #define BOARD_SIZE 3
 #define CELL_SIZE 100
@@ -20,3 +23,6 @@ bool make_move(Game *game, int row, int col);
 bool check_winner(Game *game);
 void save_game_state(Game *game, const char *output_path);
 void cleanup_game(Game *game);
+
+int arquivo_modificado(const char *filename, time_t *last_mod_time);
+void processar_json(const char *filename);

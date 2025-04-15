@@ -1,0 +1,37 @@
+{
+  "req" : {},
+  "res" : {},
+  "reqTypes" : [
+    {
+      "type" : "newGame",
+      "gameId": "bigint",
+      "gameMode": "int" // 1 = contra o computador; 2 = contra outro jogador
+    },
+    {
+      "type" : "move",
+      "gameId": "bigint",
+      "move": "int", // 1 a 9
+      "player": "int" // 1 = jogador 1; 2 = jogador 2
+    }
+  ],
+  "resTypes" : [
+    {
+      "type" : "newGame",
+      "gameId": "bigint",
+      "table": "base64", // 1 = contra o computador; 2 = contra outro jogador
+      "firstPlayer": "int" // 1 = jogador 1; 2 = jogador 2
+    },
+    {
+      "type" : "move",
+      "gameId": "bigint",
+      "availableMoves": "array" // movimentos restantes
+    },
+    {
+      "type" : "endGame",
+      "gameId": "bigint",
+      "winner": "int", // 1 = jogador 1; 2 = jogador 2; 0 = empate
+      "table": "base64",
+
+    }
+  ]
+}
