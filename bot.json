@@ -1,14 +1,16 @@
 {
   "req": {
-    "type": [
-      {
-        "item": "newGame",
-        "gameId": "bigint"
-      }
-
-    ]
+    "type": "move",
+    "gameId": "aaaa9248hdsia",
+    "position": 8
   },
   "res": {
-
-  }
+    "status": "valid",
+    "position": 8,
+    "row": 2,
+    "col": 1,
+    "game_state": "finished",
+    "winner": "X"
+  },
+  "isValid": false
 }

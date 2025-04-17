@@ -37,6 +37,17 @@ bool check_winner(Game *game) {
   return false;
 }
 
+bool is_draw(Game *game) {
+  for (int i = 0; i < BOARD_SIZE; i++) {
+    for (int j = 0; j < BOARD_SIZE; j++) {
+      if (game->game_board[i][j] == ' ') {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 void cleanup_game(Game *game) { stbi_image_free(game->board_image); }
 
 void draw_symbol(Game *game, int row, int col) {
@@ -126,9 +137,11 @@ void initialize_game(Game *game, const char *image_path) {
   game->player_turn = true;
 }
 
-bool make_move(Game *game, int row, int col) {
-  if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE ||
-      game->game_board[row][col] != ' ') {
+bool make_move(Game *game, int pos) {
+  int row = (pos - 1) / BOARD_SIZE;
+  int col = (pos - 1) % BOARD_SIZE;
+
+  if (game->game_board[row][col] != ' ') {
     return false; // Jogada inválida
   }
 

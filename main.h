@@ -19,10 +19,11 @@ typedef struct {
 
 void initialize_game(Game *game, const char *image_path);
 void draw_symbol(Game *game, int row, int col);
-bool make_move(Game *game, int row, int col);
+bool make_move(Game *game, int position);
 bool check_winner(Game *game);
 void save_game_state(Game *game, const char *output_path);
 void cleanup_game(Game *game);
+bool is_draw(Game *game);
 
 int arquivo_modificado(const char *filename, time_t *last_mod_time);
 void processar_json(const char *filename);
