@@ -1,16 +1,15 @@
 {
   "req": {
     "type": "move",
-    "gameId": "aaaa9248hdsia",
-    "position": 8
+    "gameId": "game5",
+    "position": 5
   },
   "res": {
-    "status": "valid",
-    "position": 8,
-    "row": 2,
+    "status": "invalid",
+    "position": 5,
+    "row": 1,
     "col": 1,
-    "game_state": "finished",
-    "winner": "X"
+    "game_state": "ongoing"
   },
   "isValid": false
 }

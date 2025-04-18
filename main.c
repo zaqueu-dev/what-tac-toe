@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define BUF_LEN (1024 * (EVENT_SIZE + 16))
@@ -140,7 +141,7 @@ void process_json(const char *filename) {
     json_object_set_new(res, "message", json_string("type ou gameId ausente"));
   } else if (strcmp(type, "move") == 0) {
     char game_image[128];
-    snprintf(game_image, sizeof(game_image), "%s.png", game_id);
+    snprintf(game_image, sizeof(game_image), "games/%s.png", game_id);
     Game *game = get_or_create_game(game_id, game_image);
     if (!game) {
       json_object_set_new(res, "status", json_string("error"));
@@ -152,7 +153,7 @@ void process_json(const char *filename) {
     }
   } else if (strcmp(type, "newGame") == 0) {
     char new_image[128];
-    snprintf(new_image, sizeof(new_image), "%s.png", game_id);
+    snprintf(new_image, sizeof(new_image), "games/%s.png", game_id);
 
     // Copiar board.png para <gameId>.png
     FILE *src = fopen("board.png", "rb");
