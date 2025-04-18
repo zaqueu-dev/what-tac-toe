@@ -1,0 +1,22 @@
+GET http://localhost:3000/newGame?gameMode=1
+
+###
+
+POST http://localhost:3000/move
+Content-Type: application/json
+
+{
+  "gameId": "game5",
+  "position": 5
+}
+
+###
+
+POST http://localhost:3000/move
+Content-Type: application/json
+
+{
+  "gameId": "game5",
+  "position": 2
+}
+

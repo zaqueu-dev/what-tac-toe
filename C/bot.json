@@ -2,14 +2,14 @@
   "req": {
     "type": "move",
     "gameId": "game5",
-    "position": 5
+    "position": 2
   },
   "res": {
-    "status": "invalid",
-    "position": 5,
-    "row": 1,
+    "status": "valid",
+    "position": 2,
+    "row": 0,
     "col": 1,
     "game_state": "ongoing"
   },
-  "isValid": false
+  "isValid": true
 }
