@@ -48,38 +48,40 @@ void process_move(json_t *req, json_t *res, Game *game) {
   const char *game_id = json_string_value(json_object_get(req, "gameId"));
   int position = json_integer_value(json_object_get(req, "position"));
 
+  // Verifica primeiro se a posição é válida
   if (position < 1 || position > 9) {
     json_object_set_new(res, "status", json_string("invalid"));
-    json_object_set_new(res, "message",
-                        json_string("Posição inválida (deve ser 1-9)"));
+    json_object_set_new(res, "message", json_string("Invalid position"));
     return;
   }
 
-  int row = (position - 1) / 3;
-  int col = (position - 1) % 3;
-
-  json_t *moves = json_object_get(req, "moves");
-  if (moves && json_is_array(moves)) {
-    size_t index;
-    json_t *move;
-    json_array_foreach(moves, index, move) {
-      if (json_is_object(move)) {
-        int existing_pos =
-            json_integer_value(json_object_get(move, "position"));
-        if (existing_pos == position) {
-          json_object_set_new(res, "status", json_string("invalid"));
-          json_object_set_new(res, "message",
-                              json_string("Posição já ocupada"));
-          return;
-        }
-      }
-    }
+  if (check_winner(game)) {
+    json_object_set_new(res, "status", json_string("finished"));
+    json_object_set_new(res, "message", json_string("O jogo já terminou."));
+    return;
   }
 
-  bool move_valid = make_move(game, position);
+  // Verifica se a posição já está ocupada no estado atual do jogo
+  int row = (position - 1) / 3;
+  int col = (position - 1) % 3;
+  
+  // Verifica no tabuleiro do jogo, não na lista de movimentos da requisição
+  if (game->game_board[row][col] != ' ') {
+    json_object_set_new(res, "status", json_string("invalid"));
+    json_object_set_new(res, "message", json_string("Posição já ocupada"));
+    return;
+  }
 
-  json_object_set_new(res, "status",
-                      json_string(move_valid ? "valid" : "invalid"));
+  // Tenta fazer o movimento
+  bool move_valid = make_move(game, position);
+  
+  if (!move_valid) {
+    json_object_set_new(res, "status", json_string("invalid"));
+    json_object_set_new(res, "message", json_string("Movimento inválido"));
+    return;
+  }
+
+  json_object_set_new(res, "status", json_string("valid"));
   json_object_set_new(res, "position", json_integer(position));
   json_object_set_new(res, "row", json_integer(row));
   json_object_set_new(res, "col", json_integer(col));
@@ -88,10 +90,16 @@ void process_move(json_t *req, json_t *res, Game *game) {
     char winner_str[2] = {game->player_turn ? 'O' : 'X', '\0'};
     json_object_set_new(res, "game_state", json_string("finished"));
     json_object_set_new(res, "winner", json_string(winner_str));
-  } else if (is_draw(game)) {
-    json_object_set_new(res, "game_state", json_string("draw"));
-  } else {
-    json_object_set_new(res, "game_state", json_string("ongoing"));
+    
+    // Adicione informações sobre a linha vencedora
+    json_t *winning_line = json_object();
+    json_object_set_new(winning_line, "start_row", json_integer(game->winning_line.start_row));
+    json_object_set_new(winning_line, "start_col", json_integer(game->winning_line.start_col));
+    json_object_set_new(winning_line, "end_row", json_integer(game->winning_line.end_row));
+    json_object_set_new(winning_line, "end_col", json_integer(game->winning_line.end_col));
+    json_object_set_new(winning_line, "direction", json_string(&game->winning_line.direction));
+    
+    json_object_set_new(res, "winning_line", winning_line);
   }
 }
 
@@ -179,10 +187,41 @@ void process_json(const char *filename) {
       json_object_set_new(res, "status", json_string("ok"));
       json_object_set_new(res, "message", json_string("Novo jogo criado"));
     }
-  } else {
-    json_object_set_new(res, "status", json_string("error"));
-    json_object_set_new(res, "message",
-                        json_string("Tipo de requisição inválido"));
+  } else if (strcmp(type, "endGame") == 0) {
+    const char *game_id = json_string_value(json_object_get(req, "gameId"));
+    Game *game = NULL;
+    for (int i = 0; i < game_count; ++i) {
+      if (strcmp(games[i].game_id, game_id) == 0) {
+        game = &games[i].game;
+        break;
+      }
+    }
+
+    if (game) {
+      // Delete the board image
+      char game_image[128];
+      snprintf(game_image, sizeof(game_image), "games/%s.png", game_id);
+      if (remove(game_image) != 0) {
+        perror("Error deleting game image");
+      }
+
+      // Remove the game object from the array
+      for (int i = 0; i < game_count; ++i) {
+        if (strcmp(games[i].game_id, game_id) == 0) {
+          cleanup_game(&games[i].game);
+          memmove(&games[i], &games[i + 1], (game_count - i - 1) * sizeof(GameEntry));
+          game_count--;
+          break;
+        }
+      }
+
+      // Set the response
+      json_object_set_new(res, "status", json_string("ok"));
+      json_object_set_new(res, "message", json_string("Game deleted successfully"));
+    } else {
+      json_object_set_new(res, "status", json_string("error"));
+      json_object_set_new(res, "message", json_string("Game not found"));
+    }
   }
 
   json_object_set_new(root, "res", res);
@@ -235,3 +274,5 @@ int main() {
   close(fd);
   return 0;
 }
+
+

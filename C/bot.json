@@ -1,15 +1,14 @@
 {
   "req": {
     "type": "move",
-    "gameId": "game5",
-    "position": 2
+    "gameId": "game",
+    "position": 6
   },
   "res": {
     "status": "valid",
-    "position": 2,
-    "row": 0,
-    "col": 1,
-    "game_state": "ongoing"
+    "position": 6,
+    "row": 1,
+    "col": 2
   },
-  "isValid": true
+  "isValid": false
 }
