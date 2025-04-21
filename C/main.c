@@ -55,17 +55,16 @@ void process_move(json_t *req, json_t *res, Game *game) {
     return;
   }
 
+  // Se já há um vencedor, não permitir mais jogadas
   if (check_winner(game)) {
     json_object_set_new(res, "status", json_string("finished"));
     json_object_set_new(res, "message", json_string("O jogo já terminou."));
     return;
   }
 
-  // Verifica se a posição já está ocupada no estado atual do jogo
+  // Verifica se a posição já está ocupada
   int row = (position - 1) / 3;
   int col = (position - 1) % 3;
-  
-  // Verifica no tabuleiro do jogo, não na lista de movimentos da requisição
   if (game->game_board[row][col] != ' ') {
     json_object_set_new(res, "status", json_string("invalid"));
     json_object_set_new(res, "message", json_string("Posição já ocupada"));
@@ -74,7 +73,6 @@ void process_move(json_t *req, json_t *res, Game *game) {
 
   // Tenta fazer o movimento
   bool move_valid = make_move(game, position);
-  
   if (!move_valid) {
     json_object_set_new(res, "status", json_string("invalid"));
     json_object_set_new(res, "message", json_string("Movimento inválido"));
@@ -86,22 +84,40 @@ void process_move(json_t *req, json_t *res, Game *game) {
   json_object_set_new(res, "row", json_integer(row));
   json_object_set_new(res, "col", json_integer(col));
 
+  // Salva a imagem do estado atual do jogo (com base no game_board)
+  char game_image[128];
+  snprintf(game_image, sizeof(game_image), "games/%s.png", game_id);
+  save_game_state(game, game_image);
+
+  // Converte a imagem para Base64
+  char *base64_image = encode_base64(game_image);
+  if (base64_image) {
+    json_t *encoded_str = json_string(base64_image);  // cria json string
+    json_object_set_new(res, "game_board_base64", encoded_str); // seta no objeto
+    free(base64_image); // agora é seguro liberar
+  } else {
+    json_object_set_new(res, "game_board_base64", json_string("Erro ao gerar Base64"));
+  }
+
+
+  // Verifica se há um vencedor
   if (check_winner(game)) {
     char winner_str[2] = {game->player_turn ? 'O' : 'X', '\0'};
     json_object_set_new(res, "game_state", json_string("finished"));
     json_object_set_new(res, "winner", json_string(winner_str));
-    
-    // Adicione informações sobre a linha vencedora
+
+    // Linha vencedora
     json_t *winning_line = json_object();
     json_object_set_new(winning_line, "start_row", json_integer(game->winning_line.start_row));
     json_object_set_new(winning_line, "start_col", json_integer(game->winning_line.start_col));
     json_object_set_new(winning_line, "end_row", json_integer(game->winning_line.end_row));
     json_object_set_new(winning_line, "end_col", json_integer(game->winning_line.end_col));
     json_object_set_new(winning_line, "direction", json_string(&game->winning_line.direction));
-    
+
     json_object_set_new(res, "winning_line", winning_line);
   }
 }
+
 
 void process_json(const char *filename) {
   struct stat file_stat;

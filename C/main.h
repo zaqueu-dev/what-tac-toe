@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <openssl/evp.h>
 
 #define BOARD_SIZE 3
 #define CELL_SIZE 100
@@ -33,6 +35,8 @@ bool check_winner(Game *game);
 void save_game_state(Game *game, const char *output_path);
 void cleanup_game(Game *game);
 bool is_draw(Game *game);
+
+char *encode_base64(const char *filename);
 
 void draw_winning_line(Game *game);
 

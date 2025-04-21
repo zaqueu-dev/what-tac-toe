@@ -289,3 +289,53 @@ void processar_json(const char *filename) {
   printf("\n");
   fclose(file);
 }
+
+char *encode_base64(const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        perror("Erro ao abrir arquivo");
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    uint8_t *file_data = malloc(file_size);
+    if (!file_data) {
+        fclose(file);
+        perror("Erro ao alocar memória para o arquivo");
+        return NULL;
+    }
+
+    if (fread(file_data, 1, file_size, file) != file_size) {
+        perror("Erro ao ler o arquivo completamente");
+        free(file_data);
+        fclose(file);
+        return NULL;
+    }
+
+    fclose(file);
+
+    // + espaço extra para quebras de linha e terminador
+    size_t base64_size = 4 * ((file_size + 2) / 3) + ((file_size / 48) + 1) * 2;
+    char *base64_output = malloc(base64_size + 1);
+    if (!base64_output) {
+        free(file_data);
+        perror("Erro ao alocar memória para o Base64");
+        return NULL;
+    }
+
+    EVP_ENCODE_CTX *ctx = EVP_ENCODE_CTX_new();
+    int out_len = 0, tmp_len = 0;
+    EVP_EncodeInit(ctx);
+    EVP_EncodeUpdate(ctx, (unsigned char *)base64_output, &out_len, file_data, file_size);
+    EVP_EncodeFinal(ctx, (unsigned char *)base64_output + out_len, &tmp_len);
+    out_len += tmp_len;
+    base64_output[out_len] = '\0';
+
+    EVP_ENCODE_CTX_free(ctx);
+    free(file_data);
+
+    return base64_output;
+}
