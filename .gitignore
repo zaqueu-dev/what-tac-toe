@@ -1,1 +1,47 @@
-node_modules
+node_modules# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs e editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de build e cache
+dist/
+build/
+tmp/
+temp/
+.cache/
+*.tsbuildinfo
+
+# Arquivos de banco de dados temporários
+*.sqlite
+*.sqlite3
+*.db
+
+# Arquivos de configuração pessoais
+.env
+.env.*.local
+.env.local
+
+# Git backups
+*.orig
+
+# Logs do projeto
+logs/
+*.log
+
+# Outros
+coverage/

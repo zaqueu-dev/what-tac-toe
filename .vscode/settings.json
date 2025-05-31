@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "stdio.h": "c",
-    "main.h": "c",
-    "stdbool.h": "c",
-    "math.h": "c",
-    "stb_wrapper.h": "c"
-  }
-}
