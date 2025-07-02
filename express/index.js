@@ -12,26 +12,6 @@ app.use(express.json());
 let gameIds = [];
 let lastProcessed = null;
 
-function readJsonFile() {
-  try {
-    const file = fs.readFileSync(jsonFilePath);
-    return JSON.parse(file);
-  } catch (error) {
-    console.error("Error reading file:", error);
-    return null;
-  }
-}
-
-function writeJsonFile(data) {
-  try {
-    fs.writeFileSync(jsonFilePath, JSON.stringify(data, null, 2));
-    return true;
-  } catch (error) {
-    console.error("Error writing file:", error);
-    return false;
-  }
-}
-
 function checkIsValid() {
   const data = readJsonFile();
   if (!data) return setTimeout(checkIsValid, 1000);
@@ -111,16 +91,12 @@ app.put("/game", async (req, res) => {
   console.log("Resposta do C:", fileData.res);
  
   const media = fileData.res.game_board_base64
-    ? [{
-        type: "IMAGE",
-        mimeType: "image/png",
-        data: fileData.res.game_board_base64
-      }]
+    ? []
     : []; 
 
   const jump = fileData.res.jump;
 
-  return res.json({
+  return res.json({ 
     isReturnData: true,
     data: { media, jump, gameId: cleanGameId }
   });
